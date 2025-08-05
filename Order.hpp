@@ -23,12 +23,10 @@ class Order
         std::uint64_t GetOrderId() const {return orderId;}
         Side GetSide() const {return side;}
 
-        void partialFill(std::uint32_t fillQuantity) {
-            if (fillQuantity < quantity) {
-                quantity -= fillQuantity;
-            } else {
-                quantity = 0; 
-            }
+        void fill(Order& other) {
+            std::uint32_t matchedQty = std::min(quantity, other.quantity);
+            quantity -= matchedQty;     
+            other.quantity -= matchedQty;
         }
 
         void toString() const {

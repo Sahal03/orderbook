@@ -4,13 +4,15 @@
 void OrderBook::addOrder(const Order& order) {
     order.toString();
 
-    if(matchOrder(order)) {
-        return; 
-    }
-    if (order.GetSide() == Side::BUY) {
-        bids[order.GetPrice()].push(order);
-    } else {
-        asks[order.GetPrice()].push(order);
+    Order orderCopy = order;
+    matchOrder(orderCopy);
+
+    if(orderCopy.GetQuantity() != 0) {
+        if (order.GetSide() == Side::BUY) {
+            bids[order.GetPrice()].push(orderCopy);
+        } else {
+            asks[order.GetPrice()].push(orderCopy);
+        }
     }
 }
 
@@ -27,44 +29,55 @@ void OrderBook::printBook() const {
     }
 }
 
-bool OrderBook::matchOrder(const Order& order) {
-    if (order.GetSide() == Side::BUY) {
-        auto it = asks.lower_bound(order.GetPrice());
-        if (it != asks.end() && it->first <= order.GetPrice()) {
-            auto& orderQueue = it->second;
-            if (!orderQueue.empty()) {
-                Order matchedOrder = orderQueue.front();
-                orderQueue.pop();
+void OrderBook::matchOrder(Order& order) {
+    while(order.GetQuantity() > 0) {
+        bool matched = false;
+        if (order.GetSide() == Side::BUY) {
+            auto it = asks.lower_bound(order.GetPrice());
+            if (it != asks.end() && it->first <= order.GetPrice()) {
+                auto& orderQueue = it->second;
+                if (!orderQueue.empty()) {
+                    Order& matchedOrder = orderQueue.front();
+                    matchedOrder.fill(order);
+                    if(matchedOrder.GetQuantity() == 0) {
+                        orderQueue.pop();
+                    }
 
-                std::cout << "Matched BUY Order " << order.GetOrderId() 
-                          << " with SELL Order " << matchedOrder.GetOrderId() 
-                          << " at price " << it->first << std::endl;
+                    std::cout << "Matched BUY Order " << order.GetOrderId() 
+                            << " with SELL Order " << matchedOrder.GetOrderId() 
+                            << " at price " << it->first << std::endl;
 
-
-                if (orderQueue.empty()) {
-                    asks.erase(it); 
+                    if (orderQueue.empty()) {
+                        asks.erase(it); 
+                    }
+                    matched = true;
                 }
-                return true;
+            }
+        } else {
+            auto it = bids.lower_bound(order.GetPrice());
+            if (it != bids.end() && it->first >= order.GetPrice()) {
+                auto& orderQueue = it->second;
+                if (!orderQueue.empty()) {
+                    Order& matchedOrder = orderQueue.front();
+                    matchedOrder.fill(order);
+
+                    if(matchedOrder.GetQuantity() == 0) {
+                        orderQueue.pop();
+                    }
+                    
+                    std::cout << "Matched SELL Order " << order.GetOrderId() 
+                            << " with BUY Order " << matchedOrder.GetOrderId() 
+                            << " at price " << it->first << std::endl;
+
+                    if (orderQueue.empty()) {
+                        bids.erase(it);
+                    }
+                    matched = true;
+                }
             }
         }
-    } else {
-        auto it = bids.lower_bound(order.GetPrice());
-        if (it != bids.end() && it->first >= order.GetPrice()) {
-            auto& orderQueue = it->second;
-            if (!orderQueue.empty()) {
-                Order matchedOrder = orderQueue.front();
-                orderQueue.pop();
-
-                std::cout << "Matched SELL Order " << order.GetOrderId() 
-                          << " with BUY Order " << matchedOrder.GetOrderId() 
-                          << " at price " << it->first << std::endl;
-
-                if (orderQueue.empty()) {
-                    bids.erase(it);
-                }
-                return true;
-            }
+        if (!matched) {
+            break; 
         }
     }
-    return false;
 }
