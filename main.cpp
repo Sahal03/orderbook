@@ -10,12 +10,12 @@ int main() {
 
     while(true){
         std::string choice;
-        std::cout << "Choose an option:\n1. Add Order\n2. Print Order Book\n3. Exit\n";
+        std::cout << "\nChoose an option:\n1. Add Order\n2. Print Order Book\n3. Exit\n";
         std::getline(std::cin, choice);
 
         if (choice == "1") {
             std::string input;
-            std::cout << "Enter order (format: <side> <price> <quantity>):\n"; 
+            std::cout << "\nEnter order (format: <side> <price> <quantity>):\n"; 
             std::getline(std::cin, input);
 
             std::istringstream iss(input);

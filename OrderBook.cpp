@@ -17,6 +17,7 @@ void OrderBook::addOrder(const Order& order) {
 }
 
 void OrderBook::printBook() const {
+    std::cout << "\nOrder Book:\n";
     if (asks.empty() && bids.empty()) {
         std::cout << "No orders in the book." << std::endl;
         return;
@@ -27,6 +28,7 @@ void OrderBook::printBook() const {
     for (const auto& [price, orders] : bids){
         std::cout << "BID: " << orders.size() << (orders.size() == 1 ? " Order" : " Orders") << " @ " << price << std::endl;
     }
+    std::cout << "\n";
 }
 
 void OrderBook::matchOrder(Order& order) {
