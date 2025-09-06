@@ -39,48 +39,6 @@ Follow the CLI prompts to enter BUY/SELL orders and print the book.
 
 ```text
 
-Choose an option:
-1. Add Order
-2. Print Order Book
-3. Exit
-1
+orderbook.exe < orders.csv 
 
-Enter order (format: <side> <price> <quantity>):
-BUY 150 100
-Order added: BUY 100 @ 150
-
-Choose an option:
-1. Add Order
-2. Print Order Book
-3. Exit
-1
-
-Enter order (format: <side> <price> <quantity>):
-BUY 151 50
-Order added: BUY 50 @ 151
-
-Choose an option:
-1. Add Order
-2. Print Order Book
-3. Exit
-1
-
-Enter order (format: <side> <price> <quantity>):
-SELL 151 50
-Matched BUY Order 1 with SELL Order 2 at price 151
-
-Choose an option:
-1. Add Order
-2. Print Order Book
-3. Exit
-2
-
-Order Book:
-BID: 100 Order @ 150
-
-Choose an option:
-1. Add Order
-2. Print Order Book
-3. Exit
-3
 ```

@@ -1,5 +1,7 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <string>
 
 #include "OrderBook.hpp"
 #include "Order.hpp"
@@ -8,33 +10,32 @@ int main() {
     OrderBook orderBook;
     std::uint64_t orderIdCounter = 0;
 
-    while(true){
-        std::string choice;
-        std::cout << "\nChoose an option:\n1. Add Order\n2. Print Order Book\n3. Exit\n";
-        std::getline(std::cin, choice);
+    std::string line;
 
-        if (choice == "1") {
-            std::string input;
-            std::cout << "\nEnter order (format: <side> <price> <quantity>):\n"; 
-            std::getline(std::cin, input);
-
-            std::istringstream iss(input);
-            std::string sideStr;
-            std::uint32_t price, quantity;
-
-            if (!(iss >> sideStr >> price >> quantity)) {
-                std::cerr << "Invalid input format. Please try again." << std::endl;
-                continue;
-            }
-
-            Side side = (sideStr == "BUY") ? Side::BUY : Side::SELL;
-
-            orderBook.addOrder(Order(orderIdCounter++, side, price, quantity));
-        } else if (choice == "2") {
-            orderBook.printBook();
-        } else {
-            break;
+    while(std::getline(std::cin, line)) {
+        std::istringstream ss(line);
+        std::string sideStr, strPrice, strQuantity;
+        std::uint32_t price;
+        std::uint32_t quantity;
+        
+        std::getline(ss, sideStr, ',');
+        std::getline(ss, strPrice, ',');
+        std::getline(ss, strQuantity, ',');
+        
+        if(sideStr.empty() || strPrice.empty() || strQuantity.empty()) {
+            continue;
         }
+
+        price = static_cast<uint32_t>(std::stoul(strPrice));
+        quantity = static_cast<uint32_t>(std::stoul(strQuantity));
+
+        Side side = (sideStr == "BUY") ? Side::BUY : Side::SELL;
+        Order order(orderIdCounter++, side, price, quantity);
+        orderBook.addOrder(order);
+        orderBook.printBook();    
     }
+        
+
+    
     return 0;
 }
